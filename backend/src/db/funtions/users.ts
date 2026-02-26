@@ -44,7 +44,7 @@ export const getUserDBFunc = async (
   const user = await db
     .select()
     .from(userTable)
-    .where(eq(userTable.googleId, authId))
+    .where(eq(userTable.id, authId))
     .limit(1);
 
   if (user.length === 0) {
