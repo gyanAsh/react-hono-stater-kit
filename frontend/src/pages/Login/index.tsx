@@ -1,3 +1,5 @@
+import { NavLink } from "react-router";
+
 const Login = () => {
   const handleClick = () => {
     // Redirect browser to backend OAuth endpoint
@@ -33,12 +35,14 @@ const Login = () => {
           </section>
 
           <div className="border-[0.5px] w-full"></div>
-          <a
-            className="border w-full max-w-60 hover:scale-105 active:scale-95
-           duration-75 ease-in-out cursor-pointer p-2 "
-            href={"/backend/auth/google"}
-          >
-            Login with Google
+
+          <a href={"/backend/auth/google"}>
+            <button
+              className="bg-blue-500 text-white px-5 py-2 rounded-lg hover:border w-full max-w-60 hover:scale-105 active:scale-95
+              duration-75 ease-in-out cursor-pointer "
+            >
+              Login with Google
+            </button>
           </a>
         </section>
       </div>
