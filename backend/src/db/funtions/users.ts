@@ -40,20 +40,22 @@ export const createUserDBFunc = async (
 };
 
 export const getExistingUserDBFunc = async (
-  authId: string,
+  matchData: string,
   authType: "google" | "email",
 ) => {
-  const user = await db
+  let users: typeUser[];
+  let user_column = authType === "email" ? userTable.email : userTable.googleId;
+  users = await db
     .select()
     .from(userTable)
-    .where(eq(userTable.googleId, authId))
+    .where(eq(user_column, matchData))
     .limit(1);
 
-  if (user.length === 0) {
+  if (users.length === 0) {
     return null;
   }
 
-  return user[0];
+  return users[0];
 };
 
 export const getUserInfoByIdDBFunc = async (userId: string) => {

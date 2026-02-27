@@ -1,8 +1,10 @@
 import { createUserDBFunc, getExistingUserDBFunc } from "@/db/funtions/users";
 import { createJWT, hashPassword } from "@/utils";
+import { compare } from "bcryptjs";
 import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
 import { nanoid } from "nanoid";
+import { typeUser } from "@/db/schema";
 
 const email = new Hono();
 
@@ -35,6 +37,48 @@ email.post("/register", async (c) => {
     );
 
     const token = await createJWT(newUser.id, newUser.email, newUser.name);
+    const randomId = nanoid(7);
+    setCookie(c, `${randomId}`, token, {
+      secure: Bun.env.NODE_ENV === "production", // set to false in localhost
+      path: "/",
+      httpOnly: true,
+      maxAge: 60 * 10, // 10 min
+      sameSite: "lax",
+    });
+    return c.redirect(`${Bun.env.FRONTEND_URL}/verify_login?code=${randomId}`);
+  } catch (error) {
+    return c.json({ error: "Something went wrong", err: error }, 400);
+  }
+});
+
+email.post("/login", async (c) => {
+  try {
+    const { user_email, password } = (await c.req.json()) as {
+      user_email: string;
+      password: string;
+    };
+
+    const password_regex = /^[^\s]{8,}$/;
+    if (!password_regex.test(password)) {
+      throw new Error("Min. length should be 8 without any whitespace.");
+    }
+    const email_regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!email_regex.test(user_email)) {
+      throw new Error("Invalid Email ID.");
+    }
+
+    const newUser = await getExistingUserDBFunc(user_email, "email");
+    if (newUser == null || newUser == undefined || !newUser?.password) {
+      throw new Error("Invalid Credentials.");
+    }
+
+    const password_is_correct = await compare(password, newUser.password);
+    if (!password_is_correct) {
+      throw new Error("Invalid Credentials.");
+    }
+
+    const token = await createJWT(newUser.id, newUser.email, newUser.name);
+
     const randomId = nanoid(7);
     setCookie(c, `${randomId}`, token, {
       secure: Bun.env.NODE_ENV === "production", // set to false in localhost
