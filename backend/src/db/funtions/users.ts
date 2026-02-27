@@ -10,10 +10,12 @@ export const createUserDBFunc = async (
   picture?: string | null | undefined,
   authId?: string | null | undefined,
   authType?: "google" | "email",
+  password?: string | null | undefined,
 ) => {
   const u_id = nanoid(19);
   const user: typeUser = {
     email: email,
+    password: password,
     id: u_id,
     name: name,
     emailVerified: emailVerified,
@@ -37,14 +39,28 @@ export const createUserDBFunc = async (
   }
 };
 
-export const getUserDBFunc = async (
+export const getExistingUserDBFunc = async (
   authId: string,
   authType: "google" | "email",
 ) => {
   const user = await db
     .select()
     .from(userTable)
-    .where(eq(userTable.id, authId))
+    .where(eq(userTable.googleId, authId))
+    .limit(1);
+
+  if (user.length === 0) {
+    return null;
+  }
+
+  return user[0];
+};
+
+export const getUserInfoByIdDBFunc = async (userId: string) => {
+  const user = await db
+    .select()
+    .from(userTable)
+    .where(eq(userTable.id, userId))
     .limit(1);
 
   if (user.length === 0) {

@@ -8,7 +8,7 @@ import {
 } from "arctic";
 import { getCookie, setCookie } from "hono/cookie";
 import { ObjectParser } from "@pilcrowjs/object-parser";
-import { createUserDBFunc, getUserDBFunc } from "@/db/funtions/users";
+import { createUserDBFunc, getExistingUserDBFunc } from "@/db/funtions/users";
 import { createJWT } from "@/utils";
 import { nanoid } from "nanoid";
 const google = new Hono();
@@ -81,7 +81,7 @@ google.get("/callback", async (c) => {
   const picture = claimsParser.getString("picture");
   const email = claimsParser.getString("email");
 
-  const existingUser = await getUserDBFunc(googleId, "google");
+  const existingUser = await getExistingUserDBFunc(googleId, "google");
   if (existingUser !== null) {
     const token = await createJWT(
       existingUser.id,

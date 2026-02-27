@@ -6,6 +6,7 @@
   "dependencies": {
     "@pilcrowjs/object-parser": "^0.0.4",
     "arctic": "^3.7.0",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.12.0",

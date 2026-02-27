@@ -1,5 +1,5 @@
 import { sign } from "hono/jwt";
-
+import { genSalt, hash } from "bcryptjs";
 export const createJWT = async (
   user_id: string,
   email: string,
@@ -17,3 +17,13 @@ export const createJWT = async (
 
   return token;
 };
+
+export async function hashPassword(password: string) {
+  const saltRounds = 10;
+
+  const salt = await genSalt(saltRounds);
+
+  const hashed_password = await hash(password, salt);
+
+  return hashed_password;
+}
