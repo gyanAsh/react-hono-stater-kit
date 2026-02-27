@@ -4,7 +4,6 @@ import { compare } from "bcryptjs";
 import { Hono } from "hono";
 import { setCookie } from "hono/cookie";
 import { nanoid } from "nanoid";
-import { typeUser } from "@/db/schema";
 
 const email = new Hono();
 
@@ -16,13 +15,18 @@ email.post("/register", async (c) => {
       password: string;
     };
 
-    const password_regex = /^[^\s]{8,}$/;
+    const password_regex = /^\S{8,}$/;
     if (!password_regex.test(password)) {
       throw new Error("Min. length should be 8 without any whitespace.");
     }
     const email_regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!email_regex.test(user_email)) {
       throw new Error("Invalid Email ID.");
+    }
+
+    const existingUser = await getExistingUserDBFunc(user_email, "email");
+    if (!!existingUser?.id) {
+      throw new Error("Email ID already exists.");
     }
     const hash_password = await hashPassword(password);
 
@@ -58,26 +62,34 @@ email.post("/login", async (c) => {
       password: string;
     };
 
-    const password_regex = /^[^\s]{8,}$/;
-    if (!password_regex.test(password)) {
+    const password_regex = /^\S{8,}$/;
+    if (!password || !password_regex.test(password)) {
       throw new Error("Min. length should be 8 without any whitespace.");
     }
     const email_regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!email_regex.test(user_email)) {
+    if (!user_email || !email_regex.test(user_email)) {
       throw new Error("Invalid Email ID.");
     }
 
-    const newUser = await getExistingUserDBFunc(user_email, "email");
-    if (newUser == null || newUser == undefined || !newUser?.password) {
+    const existingUser = await getExistingUserDBFunc(user_email, "email");
+    if (
+      existingUser == null ||
+      existingUser == undefined ||
+      !existingUser?.password
+    ) {
       throw new Error("Invalid Credentials.");
     }
 
-    const password_is_correct = await compare(password, newUser.password);
+    const password_is_correct = await compare(password, existingUser.password);
     if (!password_is_correct) {
       throw new Error("Invalid Credentials.");
     }
 
-    const token = await createJWT(newUser.id, newUser.email, newUser.name);
+    const token = await createJWT(
+      existingUser.id,
+      existingUser.email,
+      existingUser.name,
+    );
 
     const randomId = nanoid(7);
     setCookie(c, `${randomId}`, token, {
