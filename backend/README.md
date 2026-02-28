@@ -7,5 +7,6 @@ To run:
 ```sh
 bun run dev
 ```
+add .evn variables
 
-open http://localhost:3000
+open http://localhost:8080
