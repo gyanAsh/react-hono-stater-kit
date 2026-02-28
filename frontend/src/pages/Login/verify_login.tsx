@@ -44,7 +44,7 @@ const VerifyCode = () => {
 
   return (
     <div>
-      Verifying user...
+      Please wait user is being verifyied.
       <br />
       <h2>{q}</h2>
       <br />

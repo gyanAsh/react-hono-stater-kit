@@ -33,7 +33,7 @@ const UserInfo = () => {
 
   return (
     <div>
-      Display user info...
+      User Logged-In
       <br />
       <br />
       {JSON.stringify(query.data)}

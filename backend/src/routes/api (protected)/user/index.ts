@@ -8,7 +8,7 @@ user.get("/get-info", async (c) => {
     const payload = c.get("jwtPayload"); // decoded token payload
     if (!payload.sub) throw new Error("Token data missing.");
     const res = await getUserInfoByIdDBFunc(payload.sub);
-    return c.json({ res });
+    return c.json({ name: res?.name, emailVerified: res?.emailVerified });
   } catch (error) {
     return c.json({ error: "Something Went Wrong!", err: error });
   }
