@@ -51,7 +51,13 @@ email.post("/register", async (c) => {
     });
     return c.redirect(`${Bun.env.FRONTEND_URL}/verify_login?code=${randomId}`);
   } catch (error) {
-    return c.json({ error: "Something went wrong", err: error }, 400);
+    return c.json(
+      {
+        error: "Something went wrong",
+        err: error instanceof Error ? error.message : "Unknown Error",
+      },
+      400,
+    );
   }
 });
 
@@ -101,7 +107,13 @@ email.post("/login", async (c) => {
     });
     return c.redirect(`${Bun.env.FRONTEND_URL}/verify_login?code=${randomId}`);
   } catch (error) {
-    return c.json({ error: "Something went wrong", err: error }, 400);
+    return c.json(
+      {
+        error: "Something went wrong",
+        err: error instanceof Error ? error.message : "Unknown Error",
+      },
+      400,
+    );
   }
 });
 

@@ -1,6 +1,5 @@
 import { Input, Tabs } from "@base-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import { NavLink } from "react-router";
 import { toast } from "sonner";
 
 const Login = () => {
@@ -47,12 +46,15 @@ const EmailAuthTabs = () => {
           password,
         }),
       });
+      if (!res.ok) {
+        let errRes = await res.json();
+        throw new Error(errRes.err);
+      }
 
       return res.json();
     },
     onSuccess: async () => {},
     onError: (error) => {
-      console.error({ error });
       toast.error("Failed to Login", {
         description:
           error instanceof Error ? error.message : "Invalid credentials.",
@@ -81,20 +83,20 @@ const EmailAuthTabs = () => {
           password,
         }),
       });
-
+      if (!res.ok) {
+        let errRes = await res.json();
+        throw new Error(errRes.err);
+      }
       return res.json();
     },
     onSuccess: async () => {},
     onError: (error) => {
-      console.error({ error });
       toast.error("Failed to Register", {
         description:
           error instanceof Error ? error.message : "Something went wrong.",
       });
     },
   });
-  console.log({ loignP: loginUserFunc.isPending });
-  console.log({ regisP: registerUserFunc.isPending });
   return (
     <Tabs.Root
       className="rounded-md border border-slate-200 "
@@ -120,7 +122,6 @@ const EmailAuthTabs = () => {
         <form
           className="relative flex  py-5 px-7 flex-col gap-3.5 h-fit items-center justify-center -outline-offset-1 outline-blue-800 focus-visible:rounded-md focus-visible:outline focus-visible:outline-2"
           onSubmit={(e) => {
-            console.error("test");
             try {
               e.preventDefault();
 
@@ -141,6 +142,7 @@ const EmailAuthTabs = () => {
               }
               loginUserFunc.mutate({ email, password });
             } catch (error) {
+              console.log("bbkbkbkbkbkb");
               toast.error("Unable to Login", {
                 description:
                   error instanceof Error
@@ -190,8 +192,6 @@ const EmailAuthTabs = () => {
         <form
           className="relative flex  py-5 px-7 flex-col gap-3.5 h-fit items-center justify-center -outline-offset-1 outline-blue-800 focus-visible:rounded-md focus-visible:outline focus-visible:outline-2"
           onSubmit={(e) => {
-            console.error("test");
-
             try {
               e.preventDefault();
 
